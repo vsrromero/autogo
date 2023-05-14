@@ -19,16 +19,6 @@ class VersionController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -46,17 +36,6 @@ class VersionController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show(Version $version)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Version  $version
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Version $version)
     {
         //
     }
