@@ -20,16 +20,6 @@ class RentalController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  \App\Http\Requests\StoreRentalRequest  $request
@@ -47,17 +37,6 @@ class RentalController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show(Rental $rental)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Rental  $rental
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Rental $rental)
     {
         //
     }
