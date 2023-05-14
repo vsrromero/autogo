@@ -15,7 +15,14 @@ class CreateCarsTable extends Migration
     {
         Schema::create('cars', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('version_id');
+            $table->string('reg', 10)->unique();
+            $table->boolean('available');
+            $table->integer('ml');
             $table->timestamps();
+    
+            //foreign key (constraints)
+            $table->foreign('version_id')->references('id')->on('versions');
         });
     }
 
@@ -26,6 +33,10 @@ class CreateCarsTable extends Migration
      */
     public function down()
     {
+        //drop foreign key
+        Schema::table('cars', function (Blueprint $table) {
+            $table->dropForeign('cars_version_id_foreign');
+        });
         Schema::dropIfExists('cars');
     }
 }
