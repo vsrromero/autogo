@@ -33,6 +33,8 @@ class BrandController extends Controller
      */
     public function store(Request $request)
     {
+        // Validate request
+        $request->validate($this->brand->rules());
         // Create a new brand
         $brand = $this->brand->create($request->all());
         return response()->json($brand, 201);
@@ -48,6 +50,9 @@ class BrandController extends Controller
     {
         // Get a single brand
         $brand = $this->brand->find($id);
+        if (is_null($brand)) {
+            return response()->json(['error' => "Brand with id $id does not exist"], 404);
+        }
         return response()->json($brand, 200);
     }
 
@@ -62,6 +67,27 @@ class BrandController extends Controller
     {
         // Update a brand
         $brand = $this->brand->find($id);
+        if (is_null($brand)) {
+            return response()->json(['error' => "Unable to update - Brand with id $id does not exists"], 404);
+        }
+
+        if ($request->method() === 'PATCH') {
+            $dinamicRules = [];
+            // dinamic validation
+
+            foreach ($brand->rules($id) as $input => $rule) {
+                if (array_key_exists($input, $request->all())) {
+                    $dinamicRules[$input] = $rule;
+                }
+            }
+
+            // validation
+            $request->validate($dinamicRules);
+        } else {
+            $request->validate($this->brand->rules($id));
+        }
+
+
         $brand->update($request->all());
         return response()->json($brand, 200);
     }
@@ -76,6 +102,9 @@ class BrandController extends Controller
     {
         // Delete a brand
         $brand = $this->brand->find($id);
+        if (is_null($brand)) {
+            return response()->json(['error' => "Unable to delete - Brand with id $id does not exists"], 404);
+        }
         $brand->delete();
         return response()->json(null, 204);
     }
