@@ -35,8 +35,23 @@ class BrandController extends Controller
     {
         // Validate request
         $request->validate($this->brand->rules());
+
+        $image = $request->file('image');
+        $image_path = $image->store('images/brands', 'public');
+
         // Create a new brand
-        $brand = $this->brand->create($request->all());
+        $brand = $this->brand->create([
+            'name' => $request->name,
+            'image' => $image_path
+        ]);
+
+        /* 
+        //Another way to create a new brand
+        $brand->name = $request->name;
+        $brand->image = $image_path;
+        $brand->save();
+        */
+
         return response()->json($brand, 201);
     }
 

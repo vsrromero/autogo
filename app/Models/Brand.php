@@ -14,7 +14,7 @@ class Brand extends Model
     {
         return [
             'name' => 'required|unique:brands,name,'.$id.'|string|max:30',
-            'image' => 'required|string|max:100',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ];
     }
 
