@@ -9,4 +9,13 @@ class Brand extends Model
 {
     use HasFactory;
     protected $fillable = ['name', 'image'];
+
+    public function rules($id = null)
+    {
+        return [
+            'name' => 'required|unique:brands,name,'.$id.'|string|max:30',
+            'image' => 'required|string|max:100',
+        ];
+    }
+
 }
