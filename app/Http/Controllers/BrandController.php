@@ -47,13 +47,6 @@ class BrandController extends Controller
             'image' => $image_path
         ]);
 
-        /* 
-        //Another way to create a new brand
-        $brand->name = $request->name;
-        $brand->image = $image_path;
-        $brand->save();
-        */
-
         return response()->json($brand, 201);
     }
 
