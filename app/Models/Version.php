@@ -8,4 +8,19 @@ use Illuminate\Database\Eloquent\Model;
 class Version extends Model
 {
     use HasFactory;
+    protected $fillable = ['brand_id', 'name', 'image', 'number_of_doors', 'seats', 'airbags','abs'];
+
+    public function rules($id = null) : array
+    {
+        return [
+            'brand_id' => 'exists:brands,id',
+            'name' => 'required|unique:versions,name,'.$id.'|string|max:30',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'number_of_doors' => 'required|integer|min:3|max:5',
+            'seats' => 'required|integer|min:4|max:10',
+            'airbags' => 'required|boolean',
+            'abs' => 'required|boolean',
+        ];
+    }
+
 }
