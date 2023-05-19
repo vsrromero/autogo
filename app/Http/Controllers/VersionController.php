@@ -23,7 +23,7 @@ class VersionController extends Controller
     public function index() : JsonResponse
     {
         // Get all car versions
-        $versions = $this->version->all();
+        $versions = $this->version->with('brand')->get();
         return response()->json($versions, 200);
     }
 
@@ -64,7 +64,7 @@ class VersionController extends Controller
     public function show(int $id) : JsonResponse
     {
         // Get a single car version
-        $version = $this->version->find($id);
+        $version = $this->version->with('brand')->find($id);
         if (is_null($version)) {
             return response()->json(['error' => "Version with id $id does not exist"], 404);
         }
