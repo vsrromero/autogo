@@ -89,6 +89,7 @@ class BrandController extends Controller
     
         $dinamicRules = [];
 
+        // remove the old image from storage
         if ($request->hasFile('image')) {
             // Delete the previous image from storage
             Storage::disk('public')->delete($brand->image);
