@@ -23,7 +23,7 @@ class BrandController extends Controller
     public function index() : JsonResponse
     {
         // Get all brands
-        $brands = $this->brand->all();
+        $brands = $this->brand->with('versions')->get();
         return response()->json($brands, 200);
     }
 
@@ -59,7 +59,7 @@ class BrandController extends Controller
     public function show(int $id) : JsonResponse
     {
         // Get a single brand
-        $brand = $this->brand->find($id);
+        $brand = $this->brand->with('versions')->find($id);
         if (is_null($brand)) {
             return response()->json(['error' => "Brand with id $id does not exist"], 404);
         }

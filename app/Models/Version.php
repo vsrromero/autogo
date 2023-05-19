@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Brand;
 
 class Version extends Model
 {
@@ -21,6 +22,11 @@ class Version extends Model
             'airbags' => 'required|boolean',
             'abs' => 'required|boolean',
         ];
+    }
+
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class);
     }
 
 }
