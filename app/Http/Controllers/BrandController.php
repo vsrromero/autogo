@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Brand;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class BrandController extends Controller
 {
@@ -37,7 +38,7 @@ class BrandController extends Controller
         $request->validate($this->brand->rules());
 
         $image = $request->file('image');
-        $image_path = $image->store('images/brands', 'public');
+        $image_path = $image->store('images', 'public');
 
         // Create a new brand
         $brand = $this->brand->create([
@@ -83,27 +84,49 @@ class BrandController extends Controller
         // Update a brand
         $brand = $this->brand->find($id);
         if (is_null($brand)) {
-            return response()->json(['error' => "Unable to update - Brand with id $id does not exists"], 404);
+            return response()->json(['error' => "Unable to update - Brand with id $id does not exist"], 404);
         }
+    
+        $dinamicRules = [];
 
-        if ($request->method() === 'PATCH') {
-            $dinamicRules = [];
-            // dinamic validation
-
-            foreach ($brand->rules($id) as $input => $rule) {
-                if (array_key_exists($input, $request->all())) {
-                    $dinamicRules[$input] = $rule;
-                }
+        // remove the old image from storage
+        if ($request->hasFile('image')) {
+            // Delete the previous image from storage
+            Storage::disk('public')->delete($brand->image);
+        }
+    
+        // dinamic validation
+        foreach ($brand->rules($id) as $input => $rule) {
+            if (array_key_exists($input, $request->all())) {
+                $dinamicRules[$input] = $rule;
             }
-
-            // validation
-            $request->validate($dinamicRules);
-        } else {
-            $request->validate($this->brand->rules($id));
         }
+    
+        // validation
+        $request->validate($dinamicRules);
+    
+        // Update the fields based on the request data
+        if ($request->method() === 'PATCH') {
+            // Update only the specified fields
+            $brand->fill($request->only(array_keys($dinamicRules)));
+        } else {
+            // Update all fields for PUT requests
+            $brand->fill($request->all());
+        }
+    
+        // Update the 'image' field if it exists in the request data
+        if ($request->hasFile('image')) {
 
-
-        $brand->update($request->all());
+            $request->validate(['image' => $this->brand->rules($id)['image']]);
+    
+    
+            $image = $request->file('image');
+            $image_path = $image->store('images', 'public');
+            $brand->image = $image_path;
+        }
+    
+        $brand->save();
+    
         return response()->json($brand, 200);
     }
 
