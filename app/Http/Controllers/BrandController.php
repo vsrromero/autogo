@@ -6,6 +6,7 @@ use App\Models\Brand;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\JsonResponse;
 
 class BrandController extends Controller
 {
@@ -17,22 +18,22 @@ class BrandController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function index()
+    public function index() : JsonResponse
     {
         // Get all brands
         $brands = $this->brand->all();
-        return response($brands, 200);
+        return response()->json($brands, 200);
     }
 
     /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request)
+    public function store(Request $request) : JsonResponse
     {
         // Validate request
         $request->validate($this->brand->rules());
@@ -60,9 +61,9 @@ class BrandController extends Controller
      * Display the specified resource.
      *
      * @param  Integer  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function show($id)
+    public function show(int $id) : JsonResponse
     {
         // Get a single brand
         $brand = $this->brand->find($id);
@@ -77,9 +78,9 @@ class BrandController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  Integer  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id) : JsonResponse
     {
         // Update a brand
         $brand = $this->brand->find($id);
@@ -134,9 +135,9 @@ class BrandController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  Integer  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy($id)
+    public function destroy(int $id) : JsonResponse
     {
         // Delete a brand
         $brand = $this->brand->find($id);
