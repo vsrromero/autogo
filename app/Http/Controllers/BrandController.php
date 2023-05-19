@@ -137,6 +137,10 @@ class BrandController extends Controller
         if (is_null($brand)) {
             return response()->json(['error' => "Unable to delete - Brand with id $id does not exists"], 404);
         }
+        // Delete the image from storage
+        $version = $this->brand->find($id);
+        Storage::disk('public')->delete($version->image);
+        // Delete the brand
         $brand->delete();
         return response()->json(null, 204);
     }
