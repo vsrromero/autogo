@@ -20,10 +20,15 @@ class BrandController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index() : JsonResponse
+    public function index(Request $request) : JsonResponse
     {
-        // Get all brands
-        $brands = $this->brand->with('versions')->get();
+        if ($request->has('versions')){
+            // Get all brands
+            $brands = $this->brand->with('versions')->get(); //->with(name of the relationship method on the model)
+        } else {
+            // Get all brands all fields
+            $brands = $this->brand->all();
+        }
         return response()->json($brands, 200);
     }
 

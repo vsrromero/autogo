@@ -20,11 +20,31 @@ class VersionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index() : JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        // Get all car versions
-        $versions = $this->version->with('brand')->get();
-        return response()->json($versions, 200);
+        $versions = $this->version->query();
+
+        // Filtering fields
+        if ($request->has('fields')) {
+            $fields = explode(',', $request->query('fields'));
+            $hasBrandId = in_array('brand_id', $fields);
+
+            if (!$hasBrandId) {
+                $versions->select($fields);
+            } else {
+                $brandFields = $request->input('brand_fields');
+                $brandFields = $brandFields ? "id,{$brandFields}" : 'id';
+
+                $versions->with('brand:id,' . $brandFields)->select($fields);
+            }
+        }
+
+        // Include brand relationship if 'brands' parameter is present
+        if ($request->has('brands')) {
+            $versions->with('brand');
+        }
+
+        return response()->json($versions->get(), 200);
     }
 
     /**
@@ -33,11 +53,11 @@ class VersionController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request) : JsonResponse
+    public function store(Request $request): JsonResponse
     {
         // Validate request
         $request->validate($this->version->rules());
-        
+
         $image = $request->file('image');
         $image_path = $image->store('images', 'public');
 
@@ -61,7 +81,7 @@ class VersionController extends Controller
      * @param  Integer  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(int $id) : JsonResponse
+    public function show(int $id): JsonResponse
     {
         // Get a single car version
         $version = $this->version->with('brand')->find($id);
@@ -80,12 +100,12 @@ class VersionController extends Controller
      */
     public function update(Request $request, int $id)
     {
-        // Update a version
+        // check if the version id exists
         $version = $this->version->find($id);
         if (is_null($version)) {
             return response()->json(['error' => "Unable to update - Version with id $id does not exist"], 404);
         }
-    
+
         $dinamicRules = [];
 
         // remove the old image from storage
@@ -93,17 +113,17 @@ class VersionController extends Controller
             // Delete the previous image from storage
             Storage::disk('public')->delete($version->image);
         }
-    
+
         // dinamic validation
         foreach ($version->rules($id) as $input => $rule) {
             if (array_key_exists($input, $request->all())) {
                 $dinamicRules[$input] = $rule;
             }
         }
-    
+
         // validation
         $request->validate($dinamicRules);
-    
+
         // Update the fields based on the request data
         if ($request->method() === 'PATCH') {
             // Update only the specified fields
@@ -112,19 +132,19 @@ class VersionController extends Controller
             // Update all fields for PUT requests
             $version->fill($request->all());
         }
-    
+
         // Update the 'image' field if it exists in the request data
         if ($request->hasFile('image')) {
 
             $request->validate(['image' => $this->version->rules($id)['image']]);
-    
+
             $image = $request->file('image');
             $image_path = $image->store('images', 'public');
             $version->image = $image_path;
         }
-    
+
         $version->save();
-    
+
         return response()->json($version, 200);
     }
 
@@ -134,7 +154,7 @@ class VersionController extends Controller
      * @param  Integer  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request ,int $id) : JsonResponse
+    public function destroy(Request $request, int $id): JsonResponse
     {
         // Delete a car version
         $version = $this->version->find($id);
