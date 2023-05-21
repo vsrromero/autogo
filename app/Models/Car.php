@@ -21,4 +21,9 @@ class Car extends Model
         ];
     }
 
+    public function version()
+    {
+        return $this->belongsTo('App\Models\Version');
+    }
+
 }

@@ -13,6 +13,7 @@ class StoreCarRequest extends FormRequest
      */
     public function authorize()
     {
+        echo "Hello World";
         return false;
     }
 
@@ -28,3 +29,5 @@ class StoreCarRequest extends FormRequest
         ];
     }
 }
+
+?>

@@ -78,6 +78,7 @@ class BrandController extends Controller
      */
     public function show(int $id): JsonResponse
     {
+        
         // Get a single brand
         $brand = $this->brand->with('versions')->find($id);
         if (is_null($brand)) {
