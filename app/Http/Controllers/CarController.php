@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Car;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreCarRequest;
+use Illuminate\Http\Request;
 use App\Http\Requests\UpdateCarRequest;
 
 class CarController extends Controller
@@ -22,12 +22,12 @@ class CarController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \App\Http\Requests\StoreCarRequest  $request
+     * @param  \App\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreCarRequest $request)
+    public function store(Request $request)
     {
-        //
+        return 'store';
     }
 
     /**
@@ -44,13 +44,13 @@ class CarController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \App\Http\Requests\UpdateCarRequest  $request
-     * @param  \App\Models\Car  $car
+     * @param  \App\Http\Request  $request
+     * @param  Integer  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateCarRequest $request, Car $car)
+    public function update(Request $request, int $id)
     {
-        //
+        return 'cheguei';
     }
 
     /**
