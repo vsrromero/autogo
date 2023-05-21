@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Brand;
 use App\Http\Controllers\Controller;
+use App\Repositories\BrandRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\JsonResponse;
@@ -12,7 +13,8 @@ class BrandController extends Controller
 {
     protected $brand;
 
-    public function __construct(Brand $brand){
+    public function __construct(Brand $brand)
+    {
         $this->brand = $brand;
     }
     /**
@@ -20,16 +22,30 @@ class BrandController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index(Request $request) : JsonResponse
+
+    public function index(Request $request): JsonResponse
     {
-        if ($request->has('versions')){
-            // Get all brands
-            $brands = $this->brand->with('versions')->get(); //->with(name of the relationship method on the model)
+
+        
+        $brandRepository = new BrandRepository($this->brand);
+
+        if($request->has('fields_versions')) {
+            $fields_versions = 'versions:id,'.$request->fields_versions;
+            $brandRepository->selectFieldsRelatedRegisters($fields_versions);
         } else {
-            // Get all brands all fields
-            $brands = $this->brand->all();
+            $brandRepository->selectFieldsRelatedRegisters('versions');
         }
-        return response()->json($brands, 200);
+
+        if($request->has('filter')) {
+            $brandRepository->filter($request->filter);
+        }
+
+        if($request->has('fields')) {
+            $brandRepository->selectFields($request->fields);
+        } 
+
+        return response()->json($brandRepository->getResponse(), 200);
+
     }
 
     /**
@@ -38,7 +54,7 @@ class BrandController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request) : JsonResponse
+    public function store(Request $request): JsonResponse
     {
         // Validate request
         $request->validate($this->brand->rules());
@@ -61,7 +77,7 @@ class BrandController extends Controller
      * @param  Integer  $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function show(int $id) : JsonResponse
+    public function show(int $id): JsonResponse
     {
         // Get a single brand
         $brand = $this->brand->with('versions')->find($id);
@@ -78,14 +94,14 @@ class BrandController extends Controller
      * @param  Integer  $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request, int $id) : JsonResponse
+    public function update(Request $request, int $id): JsonResponse
     {
         // Update a brand
         $brand = $this->brand->find($id);
         if (is_null($brand)) {
             return response()->json(['error' => "Unable to update - Brand with id $id does not exist"], 404);
         }
-    
+
         $dinamicRules = [];
 
         // remove the old image from storage
@@ -93,17 +109,17 @@ class BrandController extends Controller
             // Delete the previous image from storage
             Storage::disk('public')->delete($brand->image);
         }
-    
+
         // dinamic validation
         foreach ($brand->rules($id) as $input => $rule) {
             if (array_key_exists($input, $request->all())) {
                 $dinamicRules[$input] = $rule;
             }
         }
-    
+
         // validation
         $request->validate($dinamicRules);
-    
+
         // Update the fields based on the request data
         if ($request->method() === 'PATCH') {
             // Update only the specified fields
@@ -112,20 +128,20 @@ class BrandController extends Controller
             // Update all fields for PUT requests
             $brand->fill($request->all());
         }
-    
+
         // Update the 'image' field if it exists in the request data
         if ($request->hasFile('image')) {
 
             $request->validate(['image' => $this->brand->rules($id)['image']]);
-    
-    
+
+
             $image = $request->file('image');
             $image_path = $image->store('images', 'public');
             $brand->image = $image_path;
         }
-    
+
         $brand->save();
-    
+
         return response()->json($brand, 200);
     }
 
@@ -135,7 +151,7 @@ class BrandController extends Controller
      * @param  Integer  $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(int $id) : JsonResponse
+    public function destroy(int $id): JsonResponse
     {
         // Delete a brand
         $brand = $this->brand->find($id);
