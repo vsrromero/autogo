@@ -56,7 +56,12 @@ class CarController extends Controller
         $request->validate($this->car->rules());
 
         // Create a new car
-        $car = $this->car->create($request->all());
+        $car = $this->car->create([
+            'version_id' => $request->version_id,
+            'reg' => $request->reg,
+            'available' => $request->available,
+            'ml' => $request->ml,
+        ]);
 
         return response()->json($car, 201);
     }

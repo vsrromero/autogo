@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use Faker;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\Car;
 
@@ -23,7 +22,7 @@ class CarFactory extends Factory
      */
     public function definition()
     {
-        $faker = Faker\Factory::create('en_GB');
+        $faker = \Faker\Factory::create('en_GB');
 
         return [
             'version_id' => $faker->numberBetween(8, 12),
