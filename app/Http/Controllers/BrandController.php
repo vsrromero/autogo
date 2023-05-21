@@ -25,26 +25,25 @@ class BrandController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-
         
-        $brandRepository = new BrandRepository($this->brand);
+        $brand_repository = new BrandRepository($this->brand);
 
         if($request->has('fields_versions')) {
             $fields_versions = 'versions:id,'.$request->fields_versions;
-            $brandRepository->selectFieldsRelatedRegisters($fields_versions);
+            $brand_repository->selectFieldsRelatedRegisters($fields_versions);
         } else {
-            $brandRepository->selectFieldsRelatedRegisters('versions');
+            $brand_repository->selectFieldsRelatedRegisters('versions');
         }
 
         if($request->has('filter')) {
-            $brandRepository->filter($request->filter);
+            $brand_repository->filter($request->filter);
         }
 
         if($request->has('fields')) {
-            $brandRepository->selectFields($request->fields);
+            $brand_repository->selectFields($request->fields);
         } 
 
-        return response()->json($brandRepository->getResponse(), 200);
+        return response()->json($brand_repository->getResponse(), 200);
 
     }
 
