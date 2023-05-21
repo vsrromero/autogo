@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Version;
 use App\Http\Controllers\Controller;
+use App\Repositories\VersionRepository;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
@@ -23,33 +24,24 @@ class VersionController extends Controller
 
      public function index(Request $request)
      {
-         $versions = array();
- 
-         if($request->has('fields_brand')) {
-             $fields_brand = $request->fields_brand;
-             $versions = $this->version->with('brand:id,'.$fields_brand);
-         } else {
-             $versions = $this->version->with('brand');
-         }
- 
-         if($request->has('filter')) {
-             $filters = explode(';', $request->filter);
-             foreach($filters as $key => $condition) {
- 
-                 $c = explode(':', $condition);
-                 $versions = $versions->where($c[0], $c[1], $c[2]);
- 
-             }
-         }
- 
-         if($request->has('fields')) {
-             $fields = $request->fields;
-             $versions = $versions->selectRaw($fields)->get();
-         } else {
-             $versions = $versions->get();
-         }
- 
-         return response()->json($versions, 200);
+        $version_repository = new VersionRepository($this->version);
+
+        if($request->has('fields_brand')) {
+            $fields_brand = 'brand:id,'.$request->fields_brand;
+            $version_repository->selectFieldsRelatedRegisters($fields_brand);
+        } else {
+            $version_repository->selectFieldsRelatedRegisters('brand');
+        }
+
+        if($request->has('filter')) {
+            $version_repository->filter($request->filter);
+        }
+
+        if($request->has('fields')) {
+            $version_repository->selectFields($request->fields);
+        } 
+
+        return response()->json($version_repository->getResponse(), 200);
      }
 
     /**
