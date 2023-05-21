@@ -20,32 +20,37 @@ class VersionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request): JsonResponse
-    {
-        $versions = $this->version->query();
 
-        // Filtering fields
-        if ($request->has('fields')) {
-            $fields = explode(',', $request->query('fields'));
-            $hasBrandId = in_array('brand_id', $fields);
-
-            if (!$hasBrandId) {
-                $versions->select($fields);
-            } else {
-                $brandFields = $request->input('brand_fields');
-                $brandFields = $brandFields ? "id,{$brandFields}" : 'id';
-
-                $versions->with('brand:id,' . $brandFields)->select($fields);
-            }
-        }
-
-        // Include brand relationship if 'brands' parameter is present
-        if ($request->has('brands')) {
-            $versions->with('brand');
-        }
-
-        return response()->json($versions->get(), 200);
-    }
+     public function index(Request $request)
+     {
+         $versions = array();
+ 
+         if($request->has('fields_brand')) {
+             $fields_brand = $request->fields_brand;
+             $versions = $this->version->with('brand:id,'.$fields_brand);
+         } else {
+             $versions = $this->version->with('brand');
+         }
+ 
+         if($request->has('filter')) {
+             $filters = explode(';', $request->filter);
+             foreach($filters as $key => $condition) {
+ 
+                 $c = explode(':', $condition);
+                 $versions = $versions->where($c[0], $c[1], $c[2]);
+ 
+             }
+         }
+ 
+         if($request->has('fields')) {
+             $fields = $request->fields;
+             $versions = $versions->selectRaw($fields)->get();
+         } else {
+             $versions = $versions->get();
+         }
+ 
+         return response()->json($versions, 200);
+     }
 
     /**
      * Store a newly created resource in storage.
