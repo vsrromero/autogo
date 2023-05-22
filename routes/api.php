@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,8 +19,15 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::apiResource('brands', 'BrandController');
-Route::apiResource('versions', 'VersionController');
-Route::apiResource('cars', 'CarController');
-Route::apiResource('customers', 'CustomerController');
-Route::apiResource('rentals', 'RentalController');
+Route::prefix('v1')->middleware('jwt.auth')->group(function(){
+    Route::post('me', [AuthController::class, 'me']);
+    Route::post('refresh', [AuthController::class, 'refresh']);
+    Route::post('logout', [AuthController::class, 'logout']);
+    Route::apiResource('brands', 'BrandController');
+    Route::apiResource('versions', 'VersionController');
+    Route::apiResource('cars', 'CarController');
+    Route::apiResource('customers', 'CustomerController');
+    Route::apiResource('rentals', 'RentalController');
+});
+
+Route::post('login', [AuthController::class, 'login']);
